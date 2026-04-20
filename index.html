@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FCXI — Mobile App Walkthrough</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #4FFF00;           /* in-app accent */
+    --brand-primary: #2FA84F;   /* official brand primary */
+    --brand-dark: #1F7A3A;      /* gradient / background */
+    --brand-light: #8CC63F;     /* accent / highlight */
+    --ink: #0B0F0B;
+    --ink-2: #1A1F1A;
+    --bg: #FFFFFF;
+    --bg-soft: #F5F7F5;
+    --text: #0B0F0B;
+    --text-soft: #56615A;
+    --border: #E6EAE6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Hero */
+  .hero {
+    background: radial-gradient(ellipse at top, #0F1F0F 0%, #000 60%), #000;
+    color: #fff;
+    padding: 72px 24px 96px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    right: -200px;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(79,255,0,0.25) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; }
+  .hero-layout { display: flex; gap: 48px; align-items: center; flex-wrap: wrap; }
+  .hero-text { flex: 1 1 520px; min-width: 0; }
+  .hero-logo {
+    flex: 0 0 auto;
+    width: 180px;
+    height: 180px;
+    display: grid;
+    place-items: center;
+    filter: drop-shadow(0 20px 40px rgba(79,255,0,0.2));
+  }
+  .hero-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 36px;
+  }
+  @media (max-width: 720px) {
+    .hero-logo { width: 120px; height: 120px; }
+  }
+  .brand-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 16px;
+    background: rgba(79,255,0,0.1);
+    border: 1px solid rgba(79,255,0,0.3);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand);
+    letter-spacing: 0.02em;
+    margin-bottom: 24px;
+  }
+  .brand-badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 12px var(--brand);
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 72px);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    margin-bottom: 20px;
+  }
+  .hero h1 .accent { color: var(--brand); }
+  .hero p.lead {
+    font-size: clamp(16px, 1.5vw, 20px);
+    color: #c8d0c8;
+    max-width: 640px;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: 40px;
+  }
+  .hero-meta div { font-size: 13px; color: #8a9488; }
+  .hero-meta strong { display: block; color: #fff; font-size: 17px; font-weight: 700; margin-top: 4px; }
+
+  /* Sticky nav */
+  .nav {
+    position: sticky;
+    top: 0;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: saturate(180%) blur(14px);
+    -webkit-backdrop-filter: saturate(180%) blur(14px);
+    border-bottom: 1px solid var(--border);
+    z-index: 50;
+  }
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .nav-brand {
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    padding-right: 12px;
+    border-right: 1px solid var(--border);
+  }
+  .nav-brand .dot { color: var(--brand-dark); }
+  .nav a {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    padding: 4px 0;
+    transition: color 0.15s;
+  }
+  .nav a:hover { color: var(--text); }
+
+  /* Sections */
+  section.block {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 72px 24px;
+  }
+  section.block + section.block { border-top: 1px solid var(--border); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .section-num {
+    font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 13px;
+    color: var(--brand-dark);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .section-head h2 {
+    font-size: clamp(28px, 3.5vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .section-desc {
+    max-width: 760px;
+    color: var(--text-soft);
+    font-size: 16.5px;
+    margin-bottom: 40px;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 28px 24px;
+  }
+  @media (min-width: 900px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+  }
+  .phone {
+    position: relative;
+    background: #000;
+    border-radius: 36px;
+    padding: 8px;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    cursor: zoom-in;
+  }
+  .phone:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35), 0 0 0 1px rgba(0,0,0,0.04);
+  }
+  .phone img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 28px;
+    aspect-ratio: 9 / 19.5;
+    object-fit: cover;
+    background: #eee;
+  }
+  .card .label {
+    margin-top: 16px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .card .caption {
+    font-size: 13.5px;
+    color: var(--text-soft);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .theme-tag {
+    display: inline-block;
+    margin-left: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    vertical-align: middle;
+    letter-spacing: 0.04em;
+  }
+  .theme-tag.dark { background: #111; color: var(--brand); border: 1px solid #222; }
+  .theme-tag.light { background: #F0F4F0; color: #2BB300; border: 1px solid #DDE5DD; }
+
+  /* Brand & Vision sections */
+  .brand-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 820px) {
+    .brand-grid { grid-template-columns: 1fr; }
+  }
+  .brand-logo-card {
+    background: linear-gradient(180deg, #F7FAF7 0%, #ECF4EC 100%);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 32px;
+    text-align: center;
+  }
+  .brand-logo-card img { width: 100%; max-width: 220px; height: auto; }
+  .brand-logo-card .bl-tag {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--text-soft);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .color-swatches {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .swatch {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .swatch-color { height: 90px; display: block; }
+  .swatch-body { padding: 12px 14px; }
+  .swatch-name { font-size: 13px; font-weight: 700; }
+  .swatch-hex { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .swatch-use { font-size: 11.5px; color: var(--text-soft); margin-top: 4px; }
+  .tagline {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--text);
+    margin-bottom: 20px;
+    font-weight: 500;
+  }
+  .tagline .accent { color: var(--brand-dark); font-weight: 700; }
+
+  /* Vision banner */
+  .vision-banner {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 20px 50px -20px rgba(0,0,0,0.25);
+  }
+  .vision-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .vision-banner.brand-kit { margin-top: 32px; }
+
+  /* Pill row */
+  .feature-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 24px;
+  }
+  .feature-pills span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: #F2FAF2;
+    color: #1F7A3A;
+    border: 1px solid #D5EED5;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .feature-pills span::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+  }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 24px;
+    cursor: zoom-out;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img {
+    max-width: 95%;
+    max-height: 95%;
+    border-radius: 18px;
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.6);
+    animation: zoomIn 0.2s ease;
+  }
+  .lightbox-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  @keyframes zoomIn {
+    from { transform: scale(0.95); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+  }
+
+  /* Footer */
+  footer {
+    background: #0B0F0B;
+    color: #8a9488;
+    padding: 40px 24px;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.8;
+  }
+  footer strong { color: #fff; }
+  footer .brand-line { color: var(--brand); font-weight: 700; letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-layout">
+      <div class="hero-text">
+        <div class="brand-badge">FCXI · MOBILE MVP</div>
+        <h1>The home for amateur football <span class="accent">players &amp; clubs.</span></h1>
+        <p class="lead">A mobile-first platform where amateur players showcase their skills and local clubs discover, evaluate, and recruit talent. This deck walks you through the full app experience, screen by screen.</p>
+      </div>
+      <div class="hero-logo">
+        <img src="./brand-icon.png" alt="FCXI app icon" />
+      </div>
+    </div>
+    <div class="hero-meta">
+      <div>Platform<strong>iOS &amp; Android</strong></div>
+      <div>Device reference<strong>iPhone 16 Pro Max</strong></div>
+      <div>Build<strong>FCXI v1.0.0 (MVP)</strong></div>
+      <div>Prepared<strong>April 2026</strong></div>
+    </div>
+  </div>
+</header>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">FCXI<span class="dot">.</span> Walkthrough</div>
+    <a href="#brand">Brand</a>
+    <a href="#vision">Vision</a>
+    <a href="#welcome">Welcome</a>
+    <a href="#auth">Sign in &amp; Create</a>
+    <a href="#player-onboarding">Onboarding</a>
+    <a href="#player-home">Player</a>
+    <a href="#player-profile">Profile</a>
+    <a href="#club-setup">Club Setup</a>
+    <a href="#club-home">Club</a>
+    <a href="#club-profile">Club Profile</a>
+    <a href="#messaging">Messaging</a>
+    <a href="#settings">Settings</a>
+  </div>
+</nav>
+
+<!-- 00. BRAND -->
+<section class="block" id="brand">
+  <div class="section-head">
+    <span class="section-num">00 / BRAND</span>
+    <h2>Identity &amp; visual language</h2>
+  </div>
+  <p class="section-desc">FCXI's identity is built on clarity, confidence and motion — a wordmark with a football at its heart, anchored by a disciplined green-led palette that carries across the app, store listings and marketing surfaces.</p>
+
+  <div class="brand-grid">
+    <div class="brand-logo-card">
+      <img src="./brand-logo.jpeg" alt="FCXI logo" />
+      <div class="bl-tag">FCXI · Connect Players &amp; Clubs</div>
+    </div>
+
+    <div>
+      <p class="tagline">Our green is our voice. It's on the pitch, on the jersey, on the scoreboard — <span class="accent">and now on every profile, every message, every discovery.</span></p>
+
+      <div class="color-swatches">
+        <div class="swatch">
+          <span class="swatch-color" style="background: #2FA84F;"></span>
+          <div class="swatch-body">
+            <div class="swatch-name">Primary Green</div>
+            <div class="swatch-hex">#2FA84F</div>
+            <div class="swatch-use">Primary brand color</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <span class="swatch-color" style="background: #1F7A3A;"></span>
+          <div class="swatch-body">
+            <div class="swatch-name">Dark Green</div>
+            <div class="swatch-hex">#1F7A3A</div>
+            <div class="swatch-use">Gradient / background</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <span class="swatch-color" style="background: #8CC63F;"></span>
+          <div class="swatch-body">
+            <div class="swatch-name">Light Green</div>
+            <div class="swatch-hex">#8CC63F</div>
+            <div class="swatch-use">Accent / highlight</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <span class="swatch-color" style="background: #FFFFFF; border-bottom: 1px solid var(--border);"></span>
+          <div class="swatch-body">
+            <div class="swatch-name">White</div>
+            <div class="swatch-hex">#FFFFFF</div>
+            <div class="swatch-use">Logo text, surfaces</div>
+          </div>
+        </div>
+        <div class="swatch">
+          <span class="swatch-color" style="background: #E6E6E6;"></span>
+          <div class="swatch-body">
+            <div class="swatch-name">Light Gray</div>
+            <div class="swatch-hex">#E6E6E6</div>
+            <div class="swatch-use">Shadows / subtle UI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vision-banner brand-kit">
+    <img src="./brand-kit.jpeg" alt="FCXI brand kit — wordmark, app icons and marketing banner" />
+  </div>
+</section>
+
+<!-- 00B. VISION -->
+<section class="block" id="vision">
+  <div class="section-head">
+    <span class="section-num">00 / VISION</span>
+    <h2>What we're building</h2>
+  </div>
+  <p class="section-desc">FCXI is a discovery platform for amateur football. Players build a verified profile with stats, availability, highlights and history. Clubs search, filter, evaluate and recruit — all in one app. Below is the product vision that guides every screen you're about to see.</p>
+
+  <div class="vision-banner">
+    <img src="./product-vision.jpeg" alt="FCXI product vision — player profiles, clubs, and messaging" />
+  </div>
+
+  <div class="feature-pills">
+    <span>Verified players &amp; clubs</span>
+    <span>Player stats, availability &amp; highlights</span>
+    <span>Open trials &amp; direct messaging</span>
+    <span>Location-based discovery</span>
+    <span>Dual role — same account, both sides</span>
+    <span>Push notifications in real time</span>
+  </div>
+</section>
+
+<!-- 1. WELCOME -->
+<section class="block" id="welcome">
+  <div class="section-head">
+    <span class="section-num">01 / WELCOME</span>
+    <h2>First launch &amp; role selection</h2>
+  </div>
+  <p class="section-desc">New users are greeted with the FCXI brand splash and are asked to choose their role — Player or Club. This single decision personalises the rest of the app, from the dashboard they see to the people they can discover.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.26.36.png" alt="Splash"></div>
+      <div class="label">Brand splash</div>
+      <div class="caption">The FCXI identity sets the tone — bold, energetic, football-first.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.26.54.png" alt="Role selection"></div>
+      <div class="label">Who are you? <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">A clear fork in the road — Player or Club. Each card explains the value in one line.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.27.00.png" alt="Role selection — Player"></div>
+      <div class="label">Player selected</div>
+      <div class="caption">Visual confirmation with the brand accent. A gentle note clarifies the choice is permanent.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.45.20.png" alt="Role selection — Club"></div>
+      <div class="label">Club selected</div>
+      <div class="caption">Selecting Club opens up the recruitment-side of the platform.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 2. AUTH -->
+<section class="block" id="auth">
+  <div class="section-head">
+    <span class="section-num">02 / AUTHENTICATION</span>
+    <h2>Sign in &amp; create account</h2>
+  </div>
+  <p class="section-desc">Passwordless sign-in via Email or Phone OTP. New users register with a privacy agreement, returning users sign in — both paths use a six-digit one-time code with a visible ten-minute expiry. Available in light and dark modes.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.41.35.png" alt="Login — email"></div>
+      <div class="label">Login — Email <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Returning users enter their email and get a one-time code. No passwords, no friction.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.41.37.png" alt="Login — phone"></div>
+      <div class="label">Login — Phone <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Same flow via SMS OTP for users who prefer their phone number.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.48.18.png" alt="Login — dark"></div>
+      <div class="label">Login <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">The same flow in dark mode — the app follows the user's system preference.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.48.36.png" alt="Login — rate limit"></div>
+      <div class="label">Friendly error handling</div>
+      <div class="caption">Rate limits, network errors and invalid codes surface as non-blocking, plain-English toasts.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.43.01.png" alt="Register"></div>
+      <div class="label">Create account</div>
+      <div class="caption">Registration requires explicit agreement to Terms of Service and Privacy Policy — tappable links open in-app.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.44.28.png" alt="OTP verify"></div>
+      <div class="label">Verify OTP <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Six-digit code entry with live resend timer and a clear expiry window.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.49.33.png" alt="OTP verify — dark"></div>
+      <div class="label">Verify OTP <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Consistent verification experience across modes.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 3. PLAYER ONBOARDING -->
+<section class="block" id="player-onboarding">
+  <div class="section-head">
+    <span class="section-num">03 / PLAYER ONBOARDING</span>
+    <h2>Three quick steps to a complete profile</h2>
+  </div>
+  <p class="section-desc">A player's first impression matters. We break profile creation into three focused steps — personal info, football credentials, and media — with a visible progress indicator so users always know how far they are from being discoverable by clubs.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.37.07.png" alt="Basic info"></div>
+      <div class="label">Step 1 — Basic Information</div>
+      <div class="caption">Name, date of birth, region, height and preferred foot. Only the essentials.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.19.png" alt="Football details"></div>
+      <div class="label">Step 2 — Football Details</div>
+      <div class="caption">Playing position, skill level, availability and club history — the data clubs actually search on.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.28.png" alt="Photos &amp; videos"></div>
+      <div class="label">Step 3 — Photos &amp; Videos</div>
+      <div class="caption">A profile photo and a highlight reel. This is what separates a name from a memorable player.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 4. PLAYER HOME -->
+<section class="block" id="player-home">
+  <div class="section-head">
+    <span class="section-num">04 / PLAYER EXPERIENCE</span>
+    <h2>Home, discovery &amp; inbound interest</h2>
+  </div>
+  <p class="section-desc">The player dashboard surfaces three things at a glance: profile progress, clubs near the user, and recent activity on their profile. It answers "am I being seen?" in a single scroll.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.40.png" alt="Player home — light"></div>
+      <div class="label">Home <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Profile completion card, clubs near the player, and real-time activity feed.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.22.png" alt="Player home — dark"></div>
+      <div class="label">Home <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Live profile views, suggested clubs and a running activity log in dark mode.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.45.png" alt="Clubs — light"></div>
+      <div class="label">Clubs directory <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Search clubs by name or location and filter by type — Academy, Professional, Semi-Pro.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.31.png" alt="Clubs — dark"></div>
+      <div class="label">Clubs directory <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">The same directory with dark-mode treatment and quick filter chips.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.26.png" alt="View club"></div>
+      <div class="label">View club</div>
+      <div class="caption">Players can view a club's profile, see their stats and trophies, and tap <em>Message Club</em> to start a conversation.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 5. PLAYER PROFILE -->
+<section class="block" id="player-profile">
+  <div class="section-head">
+    <span class="section-num">05 / PLAYER PROFILE</span>
+    <h2>Showcase, edit &amp; media gallery</h2>
+  </div>
+  <p class="section-desc">The player profile is a living CV. Photos, videos, position, club history and availability — all editable in place. The profile header shows the most important stats: photos, videos, and how many clubs have viewed them.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.39.01.png" alt="Profile — empty"></div>
+      <div class="label">Profile <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">A clear empty state invites new players to add media, with a direct CTA.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.42.png" alt="Profile with media"></div>
+      <div class="label">Profile with media <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Photos, a highlight video, club history and key stats come together into a rich showcase.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.40.37.png" alt="Edit profile — light"></div>
+      <div class="label">Edit profile <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">All fields editable inline, with validation and instant save.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.58.png" alt="Edit profile — dark"></div>
+      <div class="label">Edit profile <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Multi-select chips for positions, availability toggles, and one-tap photo upload.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.53.png" alt="External view — player"></div>
+      <div class="label">Public player view <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">How a club sees a player: key stats, availability badge, and a prominent <em>Message Player</em> CTA.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.07.png" alt="External view — player dark"></div>
+      <div class="label">Public player view <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Highlight media and club history are front and centre — ready for evaluation.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 6. CLUB SETUP -->
+<section class="block" id="club-setup">
+  <div class="section-head">
+    <span class="section-num">06 / CLUB SETUP</span>
+    <h2>Creating a club profile</h2>
+  </div>
+  <p class="section-desc">Clubs complete a short profile — name, location, contact, bio and type — so they can be discovered by players and show up in location-based search.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.45.28.png" alt="Club setup — empty"></div>
+      <div class="label">Club profile — empty <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">A focused single-screen form with logo upload, identity fields and a club-type selector.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.46.14.png" alt="Club setup — filled"></div>
+      <div class="label">Club profile — filled <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Filling the form gives immediate visual feedback and an active <em>Continue</em> state.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.20.png" alt="Club setup — dark"></div>
+      <div class="label">Club profile <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">The same flow in dark mode, designed for evening use.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 7. CLUB HOME -->
+<section class="block" id="club-home">
+  <div class="section-head">
+    <span class="section-num">07 / CLUB EXPERIENCE</span>
+    <h2>Discovering &amp; shortlisting players</h2>
+  </div>
+  <p class="section-desc">The club-side experience is built around discovery. A search-first dashboard surfaces the newest players, one tap opens an advanced search with filters for position and availability, and each player card leads directly to a conversation.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.45.48.png" alt="Club home — light"></div>
+      <div class="label">Club home <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Key metrics at the top — Players, Chats, Saved — and a prominent <em>Search Players</em> action.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.46.59.png" alt="Club home — dark"></div>
+      <div class="label">Club home <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Dark theme pushes the brand-green search button to the forefront.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.45.53.png" alt="Discover players"></div>
+      <div class="label">Discover players <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Filter by role, availability, or free-text — results update live with player summary cards.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.02.png" alt="Discover players — dark"></div>
+      <div class="label">Discover players <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Sort controls and filter chips stay persistent as the club scrolls.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 8. CLUB PROFILE -->
+<section class="block" id="club-profile">
+  <div class="section-head">
+    <span class="section-num">08 / CLUB PROFILE</span>
+    <h2>Overview, members &amp; achievements</h2>
+  </div>
+  <p class="section-desc">Each club gets a full profile with three tabs: <strong>Overview</strong> (bio, contact), <strong>Members</strong> (staff and player roster — visible only to the club's own members) and <strong>Achievements</strong> (trophies, milestones, participation).</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.46.00.png" alt="Club — overview"></div>
+      <div class="label">Overview <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Public club info with stats, contact and bio — the first thing a player sees.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.15.png" alt="Club — overview dark"></div>
+      <div class="label">Overview <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Segmented tabs let viewers move through the club's three sections smoothly.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.30.png" alt="Club — members"></div>
+      <div class="label">Members <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Roster management — add staff, players or associates. Only visible to club members.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.32.png" alt="Club — achievements"></div>
+      <div class="label">Achievements <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Trophies, milestones and competition participation — building social proof for the club.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 9. MESSAGING -->
+<section class="block" id="messaging">
+  <div class="section-head">
+    <span class="section-num">09 / MESSAGING</span>
+    <h2>Direct conversations between players &amp; clubs</h2>
+  </div>
+  <p class="section-desc">Once a club is interested, the conversation is one tap away. The inbox shows unread counts, and each chat thread delivers real-time messaging with delivery/read receipts and push notifications.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.45.57.png" alt="Messages empty"></div>
+      <div class="label">Inbox — empty <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">A friendly empty state — no dead ends, always a next step.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.11.png" alt="Messages empty — dark"></div>
+      <div class="label">Inbox — empty <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Dark-mode treatment of the empty state.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.50.png" alt="Messages list — light"></div>
+      <div class="label">Inbox — conversations <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Recent threads sorted by latest activity with avatars and searchable by name.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.35.png" alt="Messages list — dark"></div>
+      <div class="label">Inbox — unread counts <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Unread badges in the brand accent keep attention exactly where it's needed.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.38.57.png" alt="Chat thread"></div>
+      <div class="label">Conversation</div>
+      <div class="caption">Real-time messaging with online presence, date separators and delivery checkmarks.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- 10. SETTINGS -->
+<section class="block" id="settings">
+  <div class="section-head">
+    <span class="section-num">10 / SETTINGS &amp; PRIVACY</span>
+    <h2>Control, consent &amp; support</h2>
+  </div>
+  <p class="section-desc">A single settings screen handles profile, privacy, notifications, language, help and legal. Users decide who can see them and who can message them. Dual-role users (who are both a player and a club) can add and switch accounts here.</p>
+  <div class="grid">
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.46.04.png" alt="Settings — light"></div>
+      <div class="label">Settings <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Dual-role-aware — users who are both a club and a player can switch or add accounts.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.47.17.png" alt="Settings — club dark"></div>
+      <div class="label">Settings — Club <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">The same screen for a club account — <em>Add Player Account</em> surfaces the dual-role capability.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.50.49.png" alt="Settings — player dark"></div>
+      <div class="label">Settings — Player <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">From a player account, users can add a club account to expand their role.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.40.52.png" alt="Privacy — light"></div>
+      <div class="label">Privacy controls <span class="theme-tag light">LIGHT</span></div>
+      <div class="caption">Three simple toggles put the user in control: visibility, online status, message openness.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.51.05.png" alt="Privacy — dark"></div>
+      <div class="label">Privacy controls <span class="theme-tag dark">DARK</span></div>
+      <div class="caption">Privacy is explicit, simple and reversible.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.41.06.png" alt="Terms"></div>
+      <div class="label">Terms &amp; Privacy</div>
+      <div class="caption">Full legal text, accessible in-app — the same content users agreed to at sign-up.</div>
+    </div>
+
+    <div class="card">
+      <div class="phone"><img loading="lazy" src="./Simulator%20Screenshot%20-%20iPhone%2016%20Pro%20Max%20-%202026-04-20%20at%2011.41.01.png" alt="Help"></div>
+      <div class="label">Help &amp; Support</div>
+      <div class="caption">Direct support contact, common questions answered, and an always-available bug-report shortcut.</div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <div class="brand-line">FCXI · Connect. Play. Grow.</div>
+  <div style="margin-top: 12px;">
+    <strong>FCXI Mobile MVP — v1.0.0</strong> · iOS &amp; Android · April 2026
+  </div>
+  <div style="margin-top: 6px;">Prepared for client review. All screens captured on iPhone 16 Pro Max.</div>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" aria-label="Close">&times;</button>
+  <img src="" alt="">
+</div>
+
+<script>
+  (function(){
+    var lb = document.getElementById('lightbox');
+    var img = lb.querySelector('img');
+    document.querySelectorAll('.phone').forEach(function(el){
+      el.addEventListener('click', function(){
+        var src = el.querySelector('img').getAttribute('src');
+        img.src = src;
+        lb.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    function close(){
+      lb.classList.remove('open');
+      img.src = '';
+      document.body.style.overflow = '';
+    }
+    lb.addEventListener('click', close);
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') close();
+    });
+  })();
+</script>
+
+</body>
+</html>
